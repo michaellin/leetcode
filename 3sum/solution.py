@@ -7,23 +7,13 @@ class Solution:
     def threeSum(self, nums: List[int]) -> List[List[int]]:
         combs = combinations(nums, 3)
         res = []
+        visited = []
         for c in combs:
             if (sum(c) == 0):
-                contained = False
-                for r in res:
-                    if self.sameElems(r, c):
-                        contained = True
-                if not contained: res.append(c)
+                if (Counter(c) not in visited):
+                  res.append(c)
+                  visited.append(Counter(c))
         return res
-
-    def sameElems(self, arr1, arr2):
-        explore = 3*[False]
-        for a in arr1:
-            for i in range(len(arr2)):
-                if a == arr2[i] and not explore[i]:
-                    explore[i] = True
-                    break
-        return all(explore)
 
 s = Solution()
 #print(s.sameElems([1,2,1],[2,1,0]))
