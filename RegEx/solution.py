@@ -2,45 +2,52 @@ from typing import *
 
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
-        sIdx = 0
+        # get pattern number or characters without wildcard
+        charsNum = 0
         pIdx = 0
-        while sIdx != len(s) and pIdx != len(p):
-          # get pattern first
-          pat = p[pIdx]
-          pIdx += 1
-          # find decorator first
-          if (pIdx < len(p)) and p[pIdx] == '*':
-            pIdx += 1
-            repIdx = pIdx
-            repCount = 0
-            repPat = pat
-            # check for repeats in pattern
-            print(repPat)
-            while repIdx < len(p) and ((p[repIdx] == repPat) or (pat == '.')):
-              repIdx += 1
-              repCount += 1
-            pIdx += repCount
-            while sIdx < len(s) and ((s[sIdx] == pat) or pat == '.'):
-              sIdx += 1
-              if (repCount > 0):
-                repCount -= 1
-            if (repCount != 0):
-              return False
+        while (pIdx < len(p)):
+          if (pIdx + 1 < len(p)) and p[pIdx + 1] == '*':
+            pIdx += 2
           else:
-            if (s[sIdx] != pat and pat != '.'):
-              return False
-            sIdx += 1
-          
-        return sIdx == len(s) and pIdx == len(p)
+            charsNum += 1
+            pIdx += 1
+        return self.isMatchRecursive(s, p, charsNum)
+
+    def isMatchRecursive(self, s: str, p: str, pCharsLeft: int) -> bool:
+      if ((len(s) == 0) and (len(p) == 0)):
+        return True
+      if (len(p) > 1) and p[1] == '*':
+        # recurve deep first if we have enough pattern chars left
+        output = False
+        if ((len(s) > pCharsLeft) and (p[0] in {s[0], '.'})):
+          return self.isMatchRecursive(s[1:], p, pCharsLeft) or \
+                 self.isMatchRecursive(s, p[2:], pCharsLeft)      # backtrack
+        elif (len(s) == 0) and (pCharsLeft == 0):
+          return True
+        else:
+          # try to match the rest
+          return self.isMatchRecursive(s, p[2:], pCharsLeft)
+
+      if (len(s) == 0) != (len(p) == 0):
+        return False
+      if (p[0] in {s[0], '.'}):
+        return self.isMatchRecursive(s[1:], p[1:], pCharsLeft-1)
+      return False
 
 s = Solution()
-print(s.isMatch("aa","a"))
-print(s.isMatch("",""))
-print(s.isMatch("aa","a*"))
-print(s.isMatch("a","c*a"))
-print(s.isMatch("a","c*a"))
-print(s.isMatch("asdfgksfk",".*f"))
-print(s.isMatch("aaa","a*aaaa"))
-print(s.isMatch("aaa","a*aaa"))
-print(s.isMatch("aaabbbbb","a*aaab*bbbbb"))
-print(s.isMatch("abc",".*d"))
+assert s.isMatch("aa","a") == False
+assert s.isMatch("","") == True
+assert s.isMatch("aa","a*") == True
+assert s.isMatch("a","c*a") == True
+assert s.isMatch("asdfgksfk",".*f") == False
+assert s.isMatch("aaa","a*aaaa") == False
+assert s.isMatch("aaa","a*aaa") == True
+assert s.isMatch("aaabbbbb","a*aaab*bbbbb") == True
+assert s.isMatch("abc",".*d") == False
+assert s.isMatch("abd",".*d") == True
+assert s.isMatch("a","a*") == True
+assert s.isMatch("",".*") == True
+assert s.isMatch("a","") == False
+assert s.isMatch("","a") == False
+assert s.isMatch("aasdfasdfasdfasdfas","aasdf.*asdf.*asdf.*asdf.*s") == True
+print("All test passed")
