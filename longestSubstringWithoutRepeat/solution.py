@@ -1,5 +1,8 @@
 from typing import *
 
+# Problem:
+# Given a string s, find the length of the longest substring without repeating characters.
+
 class Solution:
     def lengthOfLongestSubstring(self, s: str) -> int:
         # we could do a brute force recursive search were 
